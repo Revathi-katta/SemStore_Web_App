@@ -94,17 +94,8 @@ npm install
 npm run dev
 ```
 
+
 ##  Development Timeline
-
-🔹 Setup Firebase Auth & Firestore DB
-🔹 User profile page with role-based data
-🔹 Upload & pending approval system
-🔹 Integrated Cloudinary for free file uploads
-🔹 Course-wise display with search and filters
-🔹 Contributor-only editing & deletion
-🔹 PWA setup and deployment (ongoing)
-
-## 📅 Development Timeline
 
 - 🔹 Setup Firebase Auth & Firestore DB
 - 🔹 User profile page with role-based data
