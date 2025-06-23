@@ -92,6 +92,7 @@ git clone https://github.com/Revathi-katta/SemStore_Web_App.git
 cd SemStore_Web_App
 npm install
 npm run dev
+```
 
 ##  Development Timeline
 
