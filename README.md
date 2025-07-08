@@ -39,8 +39,10 @@ SemStore is a Progressive Web App (PWA) built for IIT Gandhinagar students to sh
 ###  Resource Upload & Management
 - Upload multiple files per resource
 - Contributors’ uploads are auto-approved
+<div style="display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 12px;">
 <div align="center">
-  <img src="interfaceScreenshots/uploadPage.png" alt="Upload Page"/>
+  <img src="interfaceScreenshots/UploadPage.png" alt="Upload Page"/>
+</div>
 </div>
 
 - Viewers’ uploads go to a pending approval system
