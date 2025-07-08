@@ -8,15 +8,13 @@ SemStore is a Progressive Web App (PWA) built for IIT Gandhinagar students to sh
 - Login restricted to IITGN students using Google OAuth (`@iitgn.ac.in` domain)
   
 <div align="center">
-  <img src="interfaceScreenshots/loginPage.png" alt="Login Page" width="250"/>
-  <p><b>Login Page</b><br>Clean login with email and password fields for users and admins.</p>
+  <img src="interfaceScreenshots/loginPage.png" alt="Login Page"/>
 </div>
 
 - Role-based access control:
   - **Admin**: Manage users, approve resources, assign contributor roles
 <div align="center">
   <img src="interfaceScreenshots/adminHome.png" alt="Admin Home" width="250"/>
-  <p><b>Admin Home</b><br>Dashboard for admin to view reports, users, and manage uploads.</p>
 </div>
 
   - **Contributor**: Upload, approve, edit, and delete their own resources
