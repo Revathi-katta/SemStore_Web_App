@@ -14,19 +14,17 @@ SemStore is a Progressive Web App (PWA) built for IIT Gandhinagar students to sh
 - Role-based access control:
   - **Admin**: Manage users, approve resources, assign contributor roles
 <div align="center">
-  <img src="interfaceScreenshots/adminHome.png" alt="Admin Home" width="250"/>
+  <img src="interfaceScreenshots/adminHome.png" alt="Admin Home" />
 </div>
 
   - **Contributor**: Upload, approve, edit, and delete their own resources
 <div align="center">
-  <img src="interfaceScreenshots/contributorHome.png" alt="Contributor Home" width="250"/>
-  <p><b>Contributor Home</b><br>Contributors can view their uploads and repository contributions.</p>
+  <img src="interfaceScreenshots/contributorHome.png" alt="Contributor />
 </div>    
   
   - **Viewer**: Browse, upload and download resources
 <div align="center">
-  <img src="interfaceScreenshots/viewerHome.png" alt="Viewer Home" width="250"/>
-  <p><b>Viewer Home</b><br>Viewers can browse and download available study materials.</p>
+  <img src="interfaceScreenshots/viewerHome.png" alt="Viewer Home"/>
 </div>
 
 
@@ -35,37 +33,32 @@ SemStore is a Progressive Web App (PWA) built for IIT Gandhinagar students to sh
 - Auto-filled name, email, and profile picture from Google
 - Editable fields: phone number, branch, batch, bio, profile photo
 <div align="center">
-  <img src="interfaceScreenshots/profilePage.png" alt="Profile Page" width="250"/>
-  <p><b>Profile Page</b><br>View and edit your user profile and manage your details.</p>
+  <img src="interfaceScreenshots/profilePage.png" alt="Profile Page"/ >
 </div>
 
 ###  Resource Upload & Management
 - Upload multiple files per resource
 - Contributors’ uploads are auto-approved
 <div align="center">
-  <img src="interfaceScreenshots/uploadPage.png" alt="Upload Page" width="250"/>
-  <p><b>Upload Page</b><br>Upload study materials with category tagging and descriptions.</p>
+  <img src="interfaceScreenshots/uploadPage.png" alt="Upload Page"/>
 </div>
 
 - Viewers’ uploads go to a pending approval system
 - Admin/contributor approval dashboard
 <div align="center">
-  <img src="interfaceScreenshots/reviewUploads.png" alt="Review Uploads" width="250"/>
-  <p><b>Review Uploads</b><br>Admins can review and approve or reject uploads from contributors.</p>
+  <img src="interfaceScreenshots/reviewUploads.png" alt="Review Uploads"/>
 </div>
 
 ###  Course-wise Repository
 - Organized by semester, branch, and course code and filters for search
 - Contributors and uploaders can edit and delete resource
 <div align="center">
-  <img src="interfaceScreenshots/uploaderRepository.png" alt="Uploader Repository" width="250"/>
-  <p><b>Uploader Repository</b><br>Repository view for uploaders to manage their files.</p>
+  <img src="interfaceScreenshots/uploaderRepository.png" alt="Uploader Repository"/ >
 </div>
 
 -Viewer can report outdated or wrong resources
 <div align="center">
-  <img src="interfaceScreenshots/viewerRepository.png" alt="Viewer Repository" width="250"/>
-  <p><b>Viewer Repository</b><br>Repository browsing interface for viewers with category filters.</p>
+  <img src="interfaceScreenshots/viewerRepository.png" alt="Viewer Repository"/>
 </div>
 
 ###  Progressive Web App (PWA)
@@ -76,8 +69,7 @@ SemStore is a Progressive Web App (PWA) built for IIT Gandhinagar students to sh
 ###  Notifications & Moderation 
 - Admin panel to handle reports and assign contributor role to specific users
 <div align="center">
-  <img src="interfaceScreenshots/adminReports.png" alt="Admin Reports" width="250"/>
-  <p><b>Admin Reports</b><br>View reports of uploads and repository usage analytics.</p>
+  <img src="interfaceScreenshots/adminReports.png" alt="Admin Reports"/>
 </div>
 
 - Notification system for uploads, replies, and announcements (in progress)
