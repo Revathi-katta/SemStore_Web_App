@@ -69,9 +69,13 @@ SemStore is a Progressive Web App (PWA) built for IIT Gandhinagar students to sh
 - Optimized load speed
 
 ###  Notifications & Moderation 
-- Admin panel to handle reports and assign contributor role to specific users
+- Admin panel to handle reports and modify default, assign new roles to users.
 <div align="center">
   <img src="interfaceScreenshots/adminReports.png" alt="Admin Reports"/>
+</div>
+
+<div align="center">
+  <img src="interfaceScreenshots/adminUsersTab.png" alt="Admin Reports"/>
 </div>
 
 - Notification system for uploads, replies, and announcements (in progress)
