@@ -160,168 +160,173 @@ export default function UploadPage() {
     image: ".jpg,.jpeg,.png",
   };
 
-  return (
-    <div className="max-w-xl mx-auto mt-10 p-6 bg-white rounded-xl shadow space-y-4">
-      <h1 className="text-2xl font-bold mb-4">Upload Resource</h1>
+return (
+  <div className="min-h-[calc(100vh-40px)] flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-200 px-4 py-2 transition-all duration-500 font-sans">
 
-      <input
-        type="text"
-        name="courseTitle"
-        placeholder="Course Title"
-        value={form.courseTitle}
-        onChange={handleChange}
-        className="w-full border p-2 rounded"
-      />
+    <div className="w-full max-w-xl p-6 bg-white rounded-2xl shadow-xl transition-transform duration-500 hover:scale-[1.01]">
+      <h1 className="text-2xl font-extrabold text-[#00274D] mb-6 text-center">📤 Upload Resource</h1>
 
-      <textarea
-        name="description"
-        placeholder="Description (e.g. MidSem Qpaper, Assignment 2 solutions)"
-        value={form.description}
-        onChange={handleChange}
-        className="w-full border p-2 rounded"
-      />
-
-      <select
-        name="type"
-        value={form.type}
-        onChange={handleChange}
-        className="w-full border p-2 rounded"
-      >
-        <option value="pdf">PDF</option>
-        <option value="image">Image</option>
-        <option value="link">Link</option>
-      </select>
-
-      {form.type === "link" ? (
+      <div className="space-y-4">
         <input
           type="text"
-          name="link"
-          placeholder="Paste the link here"
-          value={form.link}
+          name="courseTitle"
+          placeholder="Course Title"
+          value={form.courseTitle}
           onChange={handleChange}
-          className="w-full border p-2 rounded"
+          className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition"
         />
-      ) : (
-        <>
+
+        <textarea
+          name="description"
+          placeholder="Description (e.g. MidSem Qpaper, Assignment 2 solutions)"
+          value={form.description}
+          onChange={handleChange}
+          className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition"
+          rows={3}
+        />
+
+        <select
+          name="type"
+          value={form.type}
+          onChange={handleChange}
+          className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition"
+        >
+          <option value="pdf">PDF</option>
+          <option value="image">Image</option>
+          <option value="link">Link</option>
+        </select>
+
+        {form.type === "link" ? (
           <input
-            type="file"
-            multiple
-            accept={acceptedTypes[form.type]}
-            onChange={(e) => {
-              const newFiles = Array.from(e.target.files);
-              setForm((prev) => ({
-                ...prev,
-                files: [...prev.files, ...newFiles],
-              }));
-            }}
-            className="w-full border p-2 rounded bg-gray-50"
+            type="text"
+            name="link"
+            placeholder="Paste the link here"
+            value={form.link}
+            onChange={handleChange}
+            className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition"
           />
-          {form.files.length > 0 && (
-            <div className="space-y-2 mt-2">
-              {form.files.map((file, index) => (
-                <div
-                  key={index}
-                  className="flex justify-between items-center border p-2 rounded bg-gray-100"
-                >
-                  <span className="truncate max-w-xs">{file.name}</span>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setForm((prev) => ({
-                        ...prev,
-                        files: prev.files.filter((_, i) => i !== index),
-                      }))
-                    }
-                    className="text-red-500 hover:text-red-700 font-bold ml-4"
+        ) : (
+          <>
+            <input
+              type="file"
+              multiple
+              accept={acceptedTypes[form.type]}
+              onChange={(e) => {
+                const newFiles = Array.from(e.target.files);
+                setForm((prev) => ({
+                  ...prev,
+                  files: [...prev.files, ...newFiles],
+                }));
+              }}
+              className="w-full border border-gray-300 p-3 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition"
+            />
+            {form.files.length > 0 && (
+              <div className="space-y-2 mt-2">
+                {form.files.map((file, index) => (
+                  <div
+                    key={index}
+                    className="flex justify-between items-center border border-gray-200 p-2 rounded-lg bg-gray-100"
                   >
-                    ✕
-                  </button>
-                </div>
-              ))}
+                    <span className="truncate max-w-xs text-gray-700">{file.name}</span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setForm((prev) => ({
+                          ...prev,
+                          files: prev.files.filter((_, i) => i !== index),
+                        }))
+                      }
+                      className="text-red-500 hover:text-red-700 font-bold ml-4 transition"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+
+        <input
+          type="text"
+          name="courseCode"
+          placeholder="Course Code (e.g. CS101)"
+          value={form.courseCode}
+          onChange={handleChange}
+          className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition"
+        />
+
+        <input
+          type="text"
+          name="year"
+          placeholder="Year (e.g. 2024)"
+          value={form.year}
+          onChange={handleChange}
+          className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition"
+        />
+
+        <select
+          name="semester"
+          value={form.semester}
+          onChange={handleChange}
+          className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition"
+        >
+          <option value="">Select Semester</option>
+          <option value="Semester 1 (Monsoon)">Semester 1 (Monsoon)</option>
+          <option value="Semester 2 (Winter)">Semester 2 (Winter)</option>
+        </select>
+
+        <select
+          name="branch"
+          value={form.branch}
+          onChange={handleChange}
+          className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition"
+        >
+          <option value="">Select Branch</option>
+          <option value="Artificial Intelligence">Artificial Intelligence</option>
+          <option value="Chemical Engineering">Chemical Engineering</option>
+          <option value="Civil Engineering">Civil Engineering</option>
+          <option value="Computer Science & Engineering">Computer Science & Engineering</option>
+          <option value="Electrical Engineering">Electrical Engineering</option>
+          <option value="Integrated Circuit Design & Technology">Integrated Circuit Design & Technology</option>
+          <option value="Materials Engineering">Materials Engineering</option>
+          <option value="Mechanical Engineering">Mechanical Engineering</option>
+        </select>
+
+        <input
+          type="text"
+          name="professor"
+          placeholder="Professor Name"
+          value={form.professor}
+          onChange={handleChange}
+          className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 transition"
+        />
+
+        {isUploading && (
+          <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+            <div
+              className="bg-yellow-400 h-full text-xs text-[#00274D] font-semibold text-center transition-all duration-300"
+              style={{ width: `${progress}%` }}
+            >
+              {progress}%
             </div>
-          )}
-        </>
-      )}
-
-      <input
-        type="text"
-        name="courseCode"
-        placeholder="Course Code (e.g. CS101)"
-        value={form.courseCode}
-        onChange={handleChange}
-        className="w-full border p-2 rounded"
-      />
-
-      <input
-        type="text"
-        name="year"
-        placeholder="Year (e.g. 2024)"
-        value={form.year}
-        onChange={handleChange}
-        className="w-full border p-2 rounded"
-      />
-
-      <select
-        name="semester"
-        value={form.semester}
-        onChange={handleChange}
-        className="w-full border p-2 rounded"
-      >
-        <option value="">Select Semester</option>
-        <option value="Semester 1 (Monsoon)">Semester 1 (Monsoon)</option>
-        <option value="Semester 2 (Winter)">Semester 2 (Winter)</option>
-      </select>
-
-      <select
-        name="branch"
-        value={form.branch}
-        onChange={handleChange}
-        className="w-full border p-2 rounded"
-      >
-        <option value="">Select Branch</option>
-        <option value="Artificial Intelligence">Artificial Intelligence</option>
-        <option value="Chemical Engineering">Chemical Engineering</option>
-        <option value="Civil Engineering">Civil Engineering</option>
-        <option value="Computer Science & Engineering">
-          Computer Science & Engineering
-        </option>
-        <option value="Electrical Engineering">Electrical Engineering</option>
-        <option value="Integrated Circuit Design & Technology">
-          Integrated Circuit Design & Technology
-        </option>
-        <option value="Materials Engineering">Materials Engineering</option>
-        <option value="Mechanical Engineering">Mechanical Engineering</option>
-      </select>
-
-      <input
-        type="text"
-        name="professor"
-        placeholder="Professor Name"
-        value={form.professor}
-        onChange={handleChange}
-        className="w-full border p-2 rounded"
-      />
-
-      {isUploading && (
-        <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
-          <div
-            className="bg-blue-600 h-full text-xs text-white text-center"
-            style={{ width: `${progress}%` }}
-          >
-            {progress}%
           </div>
-        </div>
-      )}
+        )}
 
-      <button
-        onClick={handleUpload}
-        disabled={isUploading}
-        className={`px-4 py-2 rounded text-white w-full ${
-          isUploading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
-        }`}
-      >
-        {isUploading ? "Uploading..." : "Upload"}
-      </button>
+        <button
+          onClick={handleUpload}
+          disabled={isUploading}
+          className={`w-full px-4 py-3 rounded-lg font-semibold tracking-wide text-lg transition-transform duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-yellow-300 ${
+            isUploading
+              ? "bg-gray-400 cursor-not-allowed text-white"
+              : "bg-yellow-400 hover:bg-yellow-500 text-[#00274D]"
+          }`}
+        >
+          {isUploading ? "Uploading..." : "Upload Resource"}
+        </button>
+      </div>
     </div>
-  );
+  </div>
+);
+
 }

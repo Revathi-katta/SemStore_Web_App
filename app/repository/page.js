@@ -7,11 +7,20 @@ import {
   getDocs,
   doc,
   deleteDoc,
+  setDoc,
   getDoc,
+  addDoc,
+  updateDoc,
+  serverTimestamp
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth"; // ✅ added
 import Fuse from "fuse.js";
 import { useRouter } from "next/navigation";
+import {
+  Trash2, Pencil, Flag, FolderOpen, Folder,
+} from "lucide-react";
+
+
 
 export default function RepositoryPage() {
   const [resources, setResources] = useState([]);
@@ -110,177 +119,260 @@ export default function RepositoryPage() {
     }));
   };
 
-  const handleDelete = async (resourceId) => {
-    const confirmDelete = confirm("Are you sure you want to delete this resource?");
-    if (!confirmDelete) return;
+  const handleReport = async (file) => {
+    const reason = prompt(
+      "Why are you reporting this resource?\n(e.g., wrong file/info, outdated, abuse)"
+    );
+    if (!reason) return;
+
+    const user = auth.currentUser;
+    if (!user) return alert("Please log in to report.");
+
+    const userDoc = await getDoc(doc(db, "users", user.uid));
+    const userInfo = userDoc.exists() ? userDoc.data() : {};
+
     try {
-      await deleteDoc(doc(db, "resources", resourceId));
-      setResources((prev) => prev.filter((r) => r.id !== resourceId));
-      alert("✅ Deleted successfully!");
+      await setDoc(doc(db, "reports", file.id), {
+        resourceId: file.id,
+        courseCode: file.courseCode || "",
+        reason,
+        reportedBy: {
+          uid: user.uid,
+          name: userInfo.name || "Unknown",
+          email: user.email,
+        },
+        timestamp: serverTimestamp(),
+      });
+
+      alert("✅ Thank you. Your report has been submitted.");
     } catch (err) {
-      console.error("❌ Delete failed:", err);
-      alert("Failed to delete the resource.");
+      console.error("❌ Report failed:", err);
+      alert("❌ Failed to submit report. Try again.");
     }
   };
+
+
 
   if (!currentUser) {
     return <p className="text-center mt-10 text-gray-600">Loading user info...</p>;
   }
 
-  return (
-    <div className="p-6 max-w-7xl mx-auto font-sans">
-      <h1 className="text-3xl font-extrabold text-center text-blue-800 mb-8">🎓 Sem-Store Course Repository</h1>
+return (
+  <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-200 py-8 px-4 md:px-8 font-sans transition-all duration-500">
+    <h1 className="text-3xl md:text-4xl font-extrabold text-center text-[#00274D] mb-10 animate-fade-in-up">
+      🎓 Sem-Store Course Repository
+    </h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-10">
-        <input
-          type="text"
-          placeholder="🔍 Search (title, code, prof, etc.)"
-          value={fuzzySearchTerm}
-          onChange={(e) => setFuzzySearchTerm(e.target.value)}
-          className="border p-2 rounded col-span-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
+    {/* Search & Filters */}
+<div className="flex flex-wrap gap-3 mb-10 animate-fade-in-up justify-center">
+  <input
+    type="text"
+    placeholder="🔍 Search (title, code, prof, etc.)"
+    value={fuzzySearchTerm}
+    onChange={(e) => setFuzzySearchTerm(e.target.value)}
+    className="flex-grow min-w-[200px] max-w-[300px] border rounded px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 transition bg-white"
+  />
 
-        <input
-          type="text"
-          name="courseCode"
-          placeholder="Course (e.g. CS101)"
-          value={filters.courseCode}
-          onChange={handleFilterChange}
-          className="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
+  <input
+    type="text"
+    name="courseCode"
+    placeholder="Course Code"
+    value={filters.courseCode}
+    onChange={handleFilterChange}
+    className="w-32 border rounded px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 transition bg-white"
+  />
 
-        <select
-          name="year"
-          value={filters.year}
-          onChange={handleFilterChange}
-          className="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-        >
-          <option value="">All Years</option>
-          {[...Array(6)].map((_, i) => {
-            const y = (2020 + i).toString();
-            return (
-              <option key={y} value={y}>
-                {y}
-              </option>
-            );
-          })}
-        </select>
+  <select
+    name="year"
+    value={filters.year}
+    onChange={handleFilterChange}
+    className="w-28 border rounded px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 transition bg-white"
+  >
+    <option value="">Year</option>
+    {[...Array(6)].map((_, i) => {
+      const y = (2020 + i).toString();
+      return (
+        <option key={y} value={y}>
+          {y}
+        </option>
+      );
+    })}
+  </select>
 
-        <select
-          name="semester"
-          value={filters.semester}
-          onChange={handleFilterChange}
-          className="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-        >
-          <option value="">All Semesters</option>
-          <option value="Semester 1 (Monsoon)">Semester 1 (Monsoon)</option>
-          <option value="Semester 2 (Winter)">Semester 2 (Winter)</option>
-        </select>
+  <select
+    name="semester"
+    value={filters.semester}
+    onChange={handleFilterChange}
+    className="w-40 border rounded px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 transition bg-white"
+  >
+    <option value="">Semester</option>
+    <option value="Semester 1 (Monsoon)">Sem 1 (Monsoon)</option>
+    <option value="Semester 2 (Winter)">Sem 2 (Winter)</option>
+  </select>
 
-        <select
-          name="type"
-          value={filters.type}
-          onChange={handleFilterChange}
-          className="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-        >
-          <option value="">All Types</option>
-          <option value="pdf">PDF</option>
-          <option value="link">Link</option>
-          <option value="image">Image</option>
-        </select>
+  <select
+    name="type"
+    value={filters.type}
+    onChange={handleFilterChange}
+    className="w-28 border rounded px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 transition bg-white"
+  >
+    <option value="">Type</option>
+    <option value="pdf">PDF</option>
+    <option value="link">Link</option>
+    <option value="image">Image</option>
+  </select>
 
-        <select
-          name="branch"
-          value={filters.branch}
-          onChange={handleFilterChange}
-          className="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-        >
-          <option value="">All Branches</option>
-          <option value="Artificial Intelligence">Artificial Intelligence</option>
-          <option value="Chemical Engineering">Chemical Engineering</option>
-          <option value="Civil Engineering">Civil Engineering</option>
-          <option value="Computer Science & Engineering">Computer Science & Engineering</option>
-          <option value="Electrical Engineering">Electrical Engineering</option>
-          <option value="Integrated Circuit Design & Technology">Integrated Circuit Design & Technology</option>
-          <option value="Materials Engineering">Materials Engineering</option>
-          <option value="Mechanical Engineering">Mechanical Engineering</option>
-        </select>
-      </div>
+  <select
+    name="branch"
+    value={filters.branch}
+    onChange={handleFilterChange}
+    className="w-48 border rounded px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 transition bg-white"
+  >
+    <option value="">Branch</option>
+    <option value="Artificial Intelligence">AI</option>
+    <option value="Chemical Engineering">Chemical Engg</option>
+    <option value="Civil Engineering">Civil Engg</option>
+    <option value="Computer Science & Engineering">CSE</option>
+    <option value="Electrical Engineering">EE</option>
+    <option value="Integrated Circuit Design & Technology">ICDT</option>
+    <option value="Materials Engineering">Materials Engg</option>
+    <option value="Mechanical Engineering">Mech Engg</option>
+  </select>
+</div>
 
-      {Object.entries(groupedResources).length === 0 ? (
-        <p className="text-center text-gray-400 text-lg mt-20">😕 No matching resources found.</p>
-      ) : (
-        <div className="space-y-6">
-          {Object.entries(groupedResources).map(([folderName, files]) => (
-            <div key={folderName} className="bg-gradient-to-r from-blue-50 to-white border border-blue-200 p-5 rounded-xl shadow">
-              <button
-                onClick={() => toggleFolder(folderName)}
-                className="text-xl font-bold text-blue-800 mb-1 w-full text-left focus:outline-none"
-              >
-                📁 {folderName} {folderOpenState[folderName] ? "▾" : "▸"}
-              </button>
 
-              {folderOpenState[folderName] && (
-                <ul className="space-y-4">
-                  {files.map((file, idx) =>
-                    file.urls?.map((url, i) => {
-                      const filename = decodeURIComponent(url.split("/").pop().split("?")[0]);
-                      const dateStr = file.timestamp?.toDate
-                        ? file.timestamp.toDate().toLocaleDateString()
-                        : "Unknown";
 
-                      const canEditOrDelete =
-                        currentUser?.uid === file.uploadedBy?.uid &&
-                        (userRole === "contributor" || userRole === "admin");
+    {Object.entries(groupedResources).length === 0 ? (
+      <p className="text-center text-gray-500 text-lg mt-20 animate-fade-in-up">
+        😕 No matching resources found.
+      </p>
+    ) : (
+      <div className="space-y-6 animate-fade-in-up">
+        {Object.entries(groupedResources).map(([folderName, files]) => (
+          <div
+            key={folderName}
+            className="bg-white border border-gray-200 rounded-xl shadow hover:shadow-md transition p-4"
+          >
+            <button
+              onClick={() => toggleFolder(folderName)}
+              className="text-lg md:text-xl font-semibold text-[#00274D] mb-3 w-full text-left focus:outline-none flex items-center gap-2 transition"
+            >
+              {folderOpenState[folderName] ? (
+                <FolderOpen className="w-5 h-5 text-blue-500" />
+              ) : (
+                <Folder className="w-5 h-5 text-blue-500" />
+              )}
+              {folderName} {folderOpenState[folderName] ? "▾" : "▸"}
+            </button>
 
-                      return (
-                        <li
-                          key={`${idx}-${i}`}
-                          className="border border-blue-100 rounded-md p-3 bg-white hover:bg-blue-50 transition"
-                        >
+            {folderOpenState[folderName] && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {files.map((file) => {
+                  const dateStr = file.timestamp?.toDate
+                    ? file.timestamp.toDate().toLocaleDateString()
+                    : "Unknown";
+                  const canEditOrDelete =
+                    currentUser?.uid === file.uploadedBy?.uid &&
+                    (userRole === "contributor" || userRole === "admin");
+
+                  return (
+                    <div
+                      key={file.id}
+                      className="border border-slate-200 rounded-lg p-4 bg-white hover:bg-slate-50 transition flex flex-col justify-between space-y-2"
+                    >
+                      {/* Title + buttons row */}
+                      <div className="flex justify-between items-start">
+                        <div className="font-semibold text-[#00274D] break-words max-w-[70%]">
+                          {file.description || "No Description"}
+                        </div>
+
+                        <div className="flex gap-1 flex-wrap">
                           {canEditOrDelete && (
-                            <div className="mt-2 flex gap-3 text-sm">
+                            <>
                               <button
-                                onClick={() => handleDelete(file.id)}
-                                className="text-red-600 hover:text-red-800 underline"
+                                onClick={async () => {
+                                  if (!confirm("Are you sure you want to delete this upload?")) return;
+                                  try {
+                                    await deleteDoc(doc(db, "resources", file.id));
+                                    setResources((prev) =>
+                                      prev.filter((r) => r.id !== file.id)
+                                    );
+                                    alert("✅ Upload deleted.");
+                                  } catch (err) {
+                                    console.error("❌ Delete failed:", err);
+                                    alert("❌ Error deleting upload.");
+                                  }
+                                }}
+                                className="px-2 py-1 rounded bg-red-500 hover:bg-red-600 text-white text-xs flex items-center gap-1 transition"
                               >
-                                🗑 Delete
+                                <Trash2 className="w-4 h-4" />
+                                Delete
                               </button>
                               <button
                                 onClick={() => router.push(`/edit/${file.id}`)}
-                                className="text-blue-600 hover:text-blue-800 underline"
+                                className="px-2 py-1 rounded bg-blue-500 hover:bg-blue-600 text-white text-xs flex items-center gap-1 transition"
                               >
-                                ✏ Edit
+                                <Pencil className="w-4 h-4" />
+                                Edit
                               </button>
-                            </div>
+                            </>
                           )}
-
-                          <a
-                            href={url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 font-semibold underline"
+                          <button
+                            onClick={() => handleReport(file)}
+                            className="px-2 py-1 rounded bg-amber-300 hover:bg-amber-400 text-[#00274D] text-xs flex items-center gap-1 transition"
                           >
-                            {filename}
-                          </a>
-                          <span className="text-gray-700 text-sm ml-1">
-                            ({file.description}, {file.year}, {file.branch})
-                          </span>
-                          <div className="text-sm text-gray-600 ml-2 mt-1 leading-snug">
-                            • <strong>Type:</strong> {file.type?.toUpperCase() || "N/A"} <br />
-                            • <strong>Uploaded by:</strong> {file.uploadedBy?.name || "Unknown"} ({file.uploadedBy?.email}) <br />
-                            • <strong>Uploaded on:</strong> {dateStr}
-                          </div>
-                        </li>
-                      );
-                    })
-                  )}
-                </ul>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+                            <Flag className="w-4 h-4" />
+                            Report
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* File URLs */}
+                      <div className="pl-2 border-l-4 border-blue-300 mt-2 flex flex-col gap-1">
+                        {file.urls?.map((url, i) => {
+                          const filename = decodeURIComponent(
+                            url.split("/").pop().split("?")[0]
+                          );
+                          return (
+                            <a
+                              key={i}
+                              href={url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-700 font-medium underline hover:text-blue-900 transition break-words"
+                            >
+                              {filename}
+                            </a>
+                          );
+                        })}
+                      </div>
+
+                      {/* Metadata */}
+                      <div className="text-sm text-gray-600 mt-1 leading-snug space-y-0.5">
+                        <div>
+                          📄 <strong>Type:</strong> {file.type?.toUpperCase() || "N/A"}
+                        </div>
+                        <div>
+                          👤 <strong>By:</strong> {file.uploadedBy?.name || "Unknown"} (
+                          {file.uploadedBy?.email})
+                        </div>
+                        <div>
+                          🗓️ <strong>Date:</strong> {dateStr}
+                        </div>
+                        <div>
+                          📘 <strong>Course:</strong> {file.courseCode || "N/A"} (
+                          {file.year}, {file.branch})
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+);
 }

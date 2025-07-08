@@ -21,31 +21,46 @@ export default function Home() {
         alert("Login failed: No authenticated user.");
         return;
       }
+      console.log("🔥 currentUser:", currentUser);
+      console.log("🔥 currentUser.photoURL:", currentUser.photoURL);
 
-      // Get role from custom claims
       const tokenResult = await currentUser.getIdTokenResult(true);
       const roleFromClaims = tokenResult.claims.role || 'viewer';
 
-      // Save to Firestore (merge only if new or updated)
+      const existingDoc = await getDoc(doc(db, 'users', currentUser.uid));
+      const fallbackPhoto = existingDoc.exists() ? existingDoc.data().photoURL : "";
+
       await setDoc(doc(db, 'users', currentUser.uid), {
         name: currentUser.displayName,
         email: currentUser.email,
-        photoURL: currentUser.photoURL,
+        photoURL: currentUser.photoURL || fallbackPhoto,
         role: roleFromClaims,
       }, { merge: true });
 
-      // Set state
+      // ✅ Add email → UID mapping for admin panel
+      await setDoc(doc(db, 'emailToUid', currentUser.email), {
+        uid: currentUser.uid,
+      });
+
       setUser({
         uid: currentUser.uid,
         displayName: currentUser.displayName,
         email: currentUser.email,
-        photoURL: currentUser.photoURL,
+        photoURL: currentUser.photoURL || fallbackPhoto, // ✅ fallback used here
         role: roleFromClaims,
       });
       setRole(roleFromClaims);
     } catch (e) {
       console.error('Login failed:', e);
-      alert('Login failed. Please try again.');
+
+      // ✅ Show specific alert if blocked by IITGN domain check
+      if (e.message === "Blocked non-IITGN email") {
+        // Do nothing – the alert was already shown in firebaseAuth.js
+      } else if (e.code === 'auth/popup-blocked') {
+        alert("Popup blocked. Please allow popups and try again.");
+      } else {
+        alert('Login failed. Please try again.');
+      }
     } finally {
       setIsLoggingIn(false);
     }
@@ -67,12 +82,15 @@ export default function Home() {
 
       const docSnap = await getDoc(doc(db, 'users', currentUser.uid));
       const storedPhoto = docSnap.exists() ? docSnap.data().photoURL : null;
+      console.log("📄 Firestore user doc:", docSnap.exists() ? docSnap.data() : "No doc");
+      console.log("📷 currentUser.photoURL:", currentUser.photoURL);
+      console.log("📷 storedPhoto:", storedPhoto);
 
       setUser({
         uid: currentUser.uid,
         displayName: currentUser.displayName,
         email: currentUser.email,
-        photoURL: currentUser.photoURL || storedPhoto,
+        photoURL: storedPhoto || currentUser.photoURL || "",
         role: roleFromClaims,
       });
       setRole(roleFromClaims);
@@ -81,74 +99,130 @@ export default function Home() {
     fetchUser();
   }, []);
 
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-gray-50">
+    return (
+    <main className="min-h-screen flex flex-col bg-white font-sans">
       {!user ? (
-        <button
-          onClick={handleLogin}
-          disabled={isLoggingIn}
-          className={`px-6 py-3 rounded-xl shadow-md text-white ${
-            isLoggingIn ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'
-          }`}
+        <div
+          className="relative flex flex-col justify-center items-center text-center min-h-screen overflow-hidden bg-cover bg-center bg-no-repeat transition-all duration-700"
+          style={{
+            backgroundImage: `url('\Pic1.jpg')`,
+          }}
         >
-          {isLoggingIn ? 'Logging in...' : 'Login with IITGN Google'}
-        </button>
-      ) : (
-        <div className="text-center">
-          <div className="flex flex-wrap justify-center gap-4 mb-4">
+          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/10"></div>
+
+
+          <div className="relative z-10 max-w-2xl px-6 animate-fade-in-up text-white drop-shadow-lg">
+            <h1 className="text-4xl md:text-5xl font-extrabold mb-4 leading-tight">
+              Sem-Store: Curated IITGN Academic Resources
+            </h1>
+            <p className="text-lg md:text-xl mb-8 text-gray-200">
+              Share, discover, and plan your semester efficiently with contributions from IITGN seniors.
+            </p>
+            <button
+              onClick={handleLogin}
+              disabled={isLoggingIn}
+              className={`px-6 py-3 rounded-full shadow-lg font-semibold tracking-wide text-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-yellow-300 ${
+                isLoggingIn
+                  ? 'bg-gray-400 cursor-not-allowed text-white'
+                  : 'bg-[#00274D] hover:bg-[#001f3a] text-white'
+              }`}
+            >
+              {isLoggingIn ? 'Logging in...' : 'Login with IITGN Email'}
+            </button>
+          </div>
+
+          <div className="absolute bottom-10 animate-bounce">
+            <svg
+              className="w-8 h-8 text-white"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </div>
+
+   ) : (
+      <>
+        {/* Top Navigation Bar */}
+        {/* <nav className="absolute top-0 left-0 w-full flex items-center justify-between px-6 py-4 bg-transparent text-white z-20"> */}
+      <nav className="flex items-center justify-between px-6 py-4 bg-[#00274D] text-white shadow-md">
+        <div className="flex items-center space-x-3">
+          <img src="/iitgn_logo.png" alt="Logo" className="w-8 h-8 drop-shadow" />
+          <span className="font-bold text-xl">Sem Store IIT Gandhinagar</span>
+        </div>
+        <div className="flex flex-wrap items-center justify-end gap-4 text-sm md:text-base">
+          <Link href="/repository" className="hover:text-yellow-400 transition">Resources</Link>
+          <Link href="/upload" className="hover:text-yellow-400 transition">Upload</Link>
+          <Link href="/profile" className="hover:text-yellow-400 transition">Profile</Link>
+
+          {(role === 'admin' || role === 'contributor') && (
+            <Link href="/pending" className="hover:text-yellow-400 transition">
+              Review Uploads
+            </Link>
+          )}
+
+          {role === 'admin' && (
+            <Link href="/admin" className="hover:text-yellow-400 transition">Admin</Link>
+          )}
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded transition text-sm md:text-base"
+          >
+            Logout
+          </button>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section
+        className="relative flex flex-col items-start justify-center text-left flex-1 bg-cover bg-center bg-no-repeat transition-all duration-700"
+        style={{
+          backgroundImage: `url('/Pic1.jpg')`,
+        }}
+      >
+        <div className="absolute inset-0 bg-black/50"></div>
+
+        <div className="relative z-10 max-w-2xl px-6 py-12 md:ml-24 md:mr-auto animate-fade-in-up">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4 leading-tight">
+            Welcome, {user.displayName}
+          </h1>
+          <p className="text-lg md:text-xl text-gray-200 mb-6">
+            Share, discover, and plan your semester efficiently with contributions from IITGN seniors.
+          </p>
+
+          <div className="flex flex-wrap justify-start gap-4">
             <Link href="/repository">
-              <button className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+              <button className="bg-yellow-400 hover:bg-yellow-500 text-[#00274D] font-medium px-5 py-2.5 rounded shadow transition">
                 Browse Resources
               </button>
             </Link>
-
-            <Link href="/profile">
-              <button className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
-                View / Edit Profile
-              </button>
-            </Link>
-
             <Link href="/upload">
-              <button className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
-                Upload Resource
+              <button className="bg-yellow-400 hover:bg-yellow-500 text-[#00274D] font-medium px-5 py-2.5 rounded shadow transition">
+                Upload
               </button>
             </Link>
-
-            {(role === 'admin' || role === 'contributor') && (
-              <Link href="/pending">
-                <button className="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700">
-                  Review Pending Uploads
+            {role === 'admin' && (
+              <Link href="/admin">
+                <button className="bg-yellow-400 hover:bg-yellow-500 text-[#00274D] font-medium px-5 py-2.5 rounded shadow transition">
+                  Admin Panel
                 </button>
               </Link>
             )}
           </div>
 
-          <h1 className="text-xl font-bold mb-2">Welcome, {user.displayName}!</h1>
-          {user?.photoURL ? (
-            <img
-              src={user.photoURL}
-              alt="Profile"
-              className="w-24 h-24 rounded-full mx-auto mt-4 shadow"
-            />
-          ) : (
-            <div className="w-24 h-24 rounded-full mx-auto mt-4 shadow bg-gray-300 flex items-center justify-center text-sm text-gray-600">
-              No Photo
-            </div>
-          )}
-
-          <p className="text-gray-600">{user.email}</p>
-          {role && (
-            <p className="mt-2 text-sm text-gray-500">Role: {role}</p>
-          )}
-
-          <button
-            onClick={handleLogout}
-            className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
-          >
-            Logout
-          </button>
+          <p className="text-gray-300 mt-6">
+            {user.email}{" "}
+            {role && (
+              <span className="italic text-gray-400">| Role: {role}</span>
+            )}
+          </p>
         </div>
-      )}
-    </main>
-  );
+      </section>
+    </>
+  )}
+</main>
+    );
 }

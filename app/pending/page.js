@@ -5,6 +5,7 @@ import { auth, db } from '../../lib/firebase';
 import {
   collection,
   getDocs,
+  setDoc,
   getDoc,
   addDoc,
   deleteDoc,
@@ -65,7 +66,10 @@ export default function PendingApprovalPage() {
         approved: true,
         timestamp: serverTimestamp(),
       };
-      await addDoc(collection(db, 'resources'), approvedData);
+
+      // ✅ Preserve the same ID when moving from pending → resources
+      await setDoc(doc(db, 'resources', res.id), approvedData); // 🛠 changed from addDoc to setDoc
+
       await deleteDoc(doc(db, 'pendingResources', res.id));
       setPending((prev) => prev.filter((item) => item.id !== res.id));
     } catch (err) {
@@ -73,6 +77,7 @@ export default function PendingApprovalPage() {
       alert('❌ Error approving. Try again.');
     }
   };
+
 
   const handleReject = async (id) => {
     try {
@@ -86,35 +91,57 @@ export default function PendingApprovalPage() {
 
   if (loading) return <p className="text-center mt-10">Loading pending uploads...</p>;
 
-  return (
-    <div className="max-w-4xl mx-auto mt-10 p-6 bg-white rounded-xl shadow space-y-6">
-      <h1 className="text-2xl font-bold mb-4">Pending Resource Approvals</h1>
+return (
+  <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-200 py-8 px-4 md:px-100 font-sans transition-all duration-500">
+    <div className="w-full max-w-4xl p-6 bg-white rounded-2xl shadow-xl transition-transform duration-500 hover:scale-[1.01] space-y-6">
+      <h1 className="text-2xl md:text-3xl font-extrabold text-[#00274D] mb-4 text-center">
+        🕓 Pending Resource Approvals
+      </h1>
 
       {pending.length === 0 ? (
-        <p>No pending uploads.</p>
+        <p className="text-center text-gray-500 text-lg mt-10">✅ No pending uploads.</p>
       ) : (
         pending.map((res) => (
-          <div key={res.id} className="border p-4 rounded space-y-2 shadow-sm">
-            <h2 className="text-lg font-semibold">{res.courseTitle || 'Untitled Course'}</h2>
-            {res.description && <p>{res.description}</p>}
-            <p>
-              <strong>Course:</strong> {res.courseCode} | <strong>Semester:</strong> {res.semester}
+          <div
+            key={res.id}
+            className="border border-gray-200 p-4 rounded-xl bg-white shadow hover:shadow-md transition duration-300 space-y-2"
+          >
+            <h2 className="text-lg md:text-xl font-bold text-[#00274D]">
+              {res.courseTitle || 'Untitled Course'}
+            </h2>
+
+            {res.description && (
+              <p className="text-gray-700">{res.description}</p>
+            )}
+
+            <p className="text-sm text-gray-600">
+              <strong>Course:</strong> {res.courseCode || 'N/A'} |{' '}
+              <strong>Semester:</strong> {res.semester || 'N/A'}
             </p>
-            <p>
-              <strong>Branch:</strong> {res.branch} | <strong>Type:</strong> {res.type}
+            <p className="text-sm text-gray-600">
+              <strong>Branch:</strong> {res.branch || 'N/A'} |{' '}
+              <strong>Type:</strong> {res.type?.toUpperCase() || 'N/A'}
             </p>
-            <p><strong>Professor:</strong> {res.professor || 'N/A'}</p>
-            <p>
-              <strong>Uploaded by:</strong> {res.uploadedBy?.name} ({res.uploadedBy?.email})
+            <p className="text-sm text-gray-600">
+              <strong>Professor:</strong> {res.professor || 'N/A'}
+            </p>
+            <p className="text-sm text-gray-600">
+              <strong>Uploaded by:</strong> {res.uploadedBy?.name || 'Unknown'} (
+              {res.uploadedBy?.email || 'Unknown'})
             </p>
 
             {res.urls?.length > 0 && (
               <div className="mt-2">
-                <strong>Files/Links:</strong>
-                <ul className="list-disc ml-6 mt-1">
+                <strong className="text-gray-700">Files/Links:</strong>
+                <ul className="list-disc ml-6 mt-1 space-y-1">
                   {res.urls.map((url, idx) => (
                     <li key={idx}>
-                      <a href={url} target="_blank" className="text-blue-600 underline">
+                      <a
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 underline hover:text-blue-800 transition"
+                      >
                         View Resource {idx + 1}
                       </a>
                     </li>
@@ -123,23 +150,24 @@ export default function PendingApprovalPage() {
               </div>
             )}
 
-            <div className="flex gap-4 mt-2">
+            <div className="flex flex-wrap gap-3 mt-3">
               <button
                 onClick={() => handleApprove(res)}
-                className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+                className="bg-green-500 hover:bg-green-600 text-white font-medium px-4 py-2 rounded-lg shadow transition"
               >
-                Approve
+                ✅ Approve
               </button>
               <button
                 onClick={() => handleReject(res.id)}
-                className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                className="bg-red-500 hover:bg-red-600 text-white font-medium px-4 py-2 rounded-lg shadow transition"
               >
-                Reject
+                ❌ Reject
               </button>
             </div>
           </div>
         ))
       )}
     </div>
-  );
+  </div>
+);
 }
