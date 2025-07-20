@@ -10,7 +10,7 @@ admin.initializeApp({
 
 const uid = '3BGSRnw7E3c51DvmKd7uQUtHVxS2'; // replace with the actual UID
 
-admin.auth().setCustomUserClaims(uid, { role: 'contributor' })
+admin.auth().setCustomUserClaims(uid, { role: 'admin' })
   .then(() => {
     console.log('Custom claims set successfully');
     process.exit(0);
