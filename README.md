@@ -19,7 +19,7 @@ SemStore is a Progressive Web App (PWA) built for IIT Gandhinagar students to sh
 
   - **Contributor**: Upload, approve, edit, and delete their own resources
 <div align="center">
-  <img src="interfaceScreenshots/contributorHome.png" alt="Contributor />
+  <img src="interfaceScreenshots/contributorHome.png" alt="Contributor"/>
 </div>    
   
   - **Viewer**: Browse, upload and download resources
