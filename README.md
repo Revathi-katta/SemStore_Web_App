@@ -58,7 +58,7 @@ SemStore is a Progressive Web App (PWA) built for IIT Gandhinagar students to sh
   <img src="interfaceScreenshots/uploaderRepository.png" alt="Uploader Repository"/ >
 </div>
 
--Viewer can report outdated or wrong resources
+- Viewer can report outdated or wrong resources
 <div align="center">
   <img src="interfaceScreenshots/viewerRepository.png" alt="Viewer Repository"/>
 </div>
@@ -69,7 +69,7 @@ SemStore is a Progressive Web App (PWA) built for IIT Gandhinagar students to sh
 - Optimized load speed
 
 ###  Notifications & Moderation 
-- Admin panel to handle reports and modify default, assign new roles to users.
+- Admin panel with two tabs one for handling reports and other to modify default, assign new roles to users.
 <div align="center">
   <img src="interfaceScreenshots/adminReports.png" alt="Admin Reports"/>
 </div>
