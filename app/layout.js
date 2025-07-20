@@ -26,6 +26,11 @@ export default function RootLayout({ children }) {
           type="text/javascript"
           async
         ></script>
+
+        {/* ✅ PWA meta + manifest */}
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#1e293b" />
+        <link rel="apple-touch-icon" href="/iitgn_logo.png" />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
@@ -33,3 +38,4 @@ export default function RootLayout({ children }) {
     </html>
   );
 }
+
